@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>홀짝 게임</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #74ebd5, #acb6e5);
+      color: #333;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #ffffff;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      width: 100%;
+    }
+
+    .input-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .input-container input {
+      padding: 10px;
+      font-size: 1rem;
+      width: 200px;
+      border: 2px solid #ffffff;
+      border-radius: 5px;
+      outline: none;
+      text-align: center;
+      background-color: rgba(255, 255, 255, 0.8);
+    }
+
+    .input-container input:focus {
+      border-color: #74ebd5;
+      box-shadow: 0 0 8px rgba(116, 235, 213, 0.8);
+    }
+
+    .dice-container {
+      display: flex;
+      gap: 10px;
+      margin: 20px;
+    }
+
+    .dice {
+      width: 120px;
+      height: 120px;
+      border: 2px solid #ffffff;
+      border-radius: 8px;
+      background-color: #ffffff;
+      font-size: 3rem;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+      color: transparent;
+      transform-origin: center;
+      perspective: 800px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      color: #ffffff;
+      background-color: #4a90e2;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #357ab8;
+      transform: translateY(-2px);
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      font-size: 1rem;
+      width: 200px;
+      border: 2px solid #ffffff;
+      border-radius: 5px;
+      outline: none;
+      text-align: center;
+      background-color: rgba(255, 255, 255, 0.8);
+    }
+
+    input[type="text"]:focus {
+      border-color: #74ebd5;
+      box-shadow: 0 0 8px rgba(116, 235, 213, 0.8);
+    }
+
+    .output {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .output#result {
+      color: #f0f0f0;
+    }
+
+    .output span {
+      color: #ffffff;
+    }
+
+    #score {
+      font-size: 1.5rem;
+    }
+
+    .game-container {
+      display: flex;
+    }
+
+    .game-area {
+      margin-right: 50px;
+    }
+
+    .record-area {
+      width: 200px;
+      padding: 20px;
+      background-color: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      color: white;
+    }
+
+    .record-area h3 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .record-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .record-list li {
+      margin-bottom: 10px;
+      padding: 5px;
+      background-color: #333;
+      border-radius: 5px;
+      text-align: center;
+    }
+
+    @keyframes shake {
+      0% { transform: rotate(0); }
+      25% { transform: rotate(10deg); }
+      50% { transform: rotate(0); }
+      75% { transform: rotate(-10deg); }
+      100% { transform: rotate(0); }
+    }
+
+    @keyframes roll {
+      0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+      10% { transform: rotateX(90deg) rotateY(45deg) rotateZ(90deg); }
+      20% { transform: rotateX(-45deg) rotateY(180deg) rotateZ(180deg); }
+      30% { transform: rotateX(180deg) rotateY(90deg) rotateZ(-45deg); }
+      40% { transform: rotateX(90deg) rotateY(135deg) rotateZ(270deg); }
+      50% { transform: rotateX(-45deg) rotateY(270deg) rotateZ(0deg); }
+      60% { transform: rotateX(0deg) rotateY(360deg) rotateZ(90deg); }
+      70% { transform: rotateX(180deg) rotateY(45deg) rotateZ(270deg); }
+      80% { transform: rotateX(90deg) rotateY(180deg) rotateZ(45deg); }
+      90% { transform: rotateX(-90deg) rotateY(90deg) rotateZ(360deg); }
+      100% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+    }
+
+    .dice-rolling {
+      animation: roll 2s ease-in-out 8; /* 8번 섞이도록 설정 */
+    }
+
+  </style>
+</head>
+<body>
+  <div id="userSection">
+    <h1>홀짝 게임!</h1>
+    <div class="input-container">
+      <input type="text" id="userName" placeholder="아이디를 입력하세요">
+      <button onclick="startGame()">게임 시작</button>
+    </div>
+  </div>
+
+  <div id="gameSection" style="display: none;">
+    <div class="game-container">
+      <div class="game-area">
+        <div class="dice-container">
+          <div id="dice1" class="dice">1</div>
+          <div id="dice2" class="dice">1</div>
+        </div>
+
+        <div class="output">
+          <label for="userInput">홀 또는 짝을 입력하세요:</label>
+          <input type="text" id="userInput" placeholder="홀 or 짝" onkeydown="checkOnEnter(event)">
+        </div>
+
+        <div class="output" id="result">결과가 여기에 표시됩니다.</div>
+        <div class="output">맞춘 개수: <span id="score">0</span></div>
+        <div class="output">남은 게임: <span id="remainingGames">5</span></div>
+      </div>
+
+      <div class="record-area">
+        <h3>기록</h3>
+        <ul class="record-list" id="recordList">
+          <!-- 여기에 기록들이 추가됩니다 -->
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let score = 0;
+    let remainingGames = 5;
+    let correctAnswers = 0;
+    let userName = '';
+    let records = [];
+
+    function startGame() {
+      userName = document.getElementById("userName").value.trim();
+      if (!userName) {
+        alert("아이디를 입력해주세요!");
+        return;
+      }
+
+      document.getElementById("userSection").style.display = "none";
+      document.getElementById("gameSection").style.display = "flex";
+      
+      // 게임 시작 시 주사위 자동 섞기
+      shakeDice();
+    }
+
+    function shakeDice() {
+      const dice1 = document.getElementById("dice1");
+      const dice2 = document.getElementById("dice2");
+
+      // 주사위 숫자 보여주기
+      dice1.classList.remove("dice-rolling");
+      dice2.classList.remove("dice-rolling");
+
+      dice1.style.color = "#333";
+      dice2.style.color = "#333";
+
+      setTimeout(() => {
+        // 주사위 회전 애니메이션 실행
+        dice1.classList.add("dice-rolling");
+        dice2.classList.add("dice-rolling");
+
+        setTimeout(() => {
+          const dice1Value = Math.floor(Math.random() * 6) + 1;
+          const dice2Value = Math.floor(Math.random() * 6) + 1;
+          dice1.textContent = dice1Value;
+          dice2.textContent = dice2Value;
+
+          dice1.classList.remove("dice-rolling");
+          dice2.classList.remove("dice-rolling");
+
+          dice1.style.color = "transparent";
+          dice2.style.color = "transparent";
+
+          document.getElementById("userInput").disabled = false;
+        }, 2000); // 주사위 회전 2초 후에 실행
+      }, 500); // 0.5초 기다린 후 숫자 보이게
+    }
+
+    function checkOnEnter(event) {
+      if (event.key === "Enter") {
+        checkAnswer();
+      }
+    }
+
+    function checkAnswer() {
+      const userInput = document.getElementById("userInput").value.trim();
+      const dice1 = document.getElementById("dice1");
+      const dice2 = document.getElementById("dice2");
+      const dice1Value = parseInt(dice1.textContent);
+      const dice2Value = parseInt(dice2.textContent);
+      const sum = dice1Value + dice2Value;
+      const isEven = sum % 2 === 0;
+      const resultDiv = document.getElementById("result");
+
+      let correctAnswer = isEven ? "짝" : "홀";
+      if (userInput === correctAnswer) {
+        score++;
+        resultDiv.textContent = `정답! (${sum}였습니다)`;
+        resultDiv.style.color = "#32cd32";  // 초록색
+      } else {
+        resultDiv.textContent = `오답! (${sum}였습니다)`;
+        resultDiv.style.color = "#ff4500";  // 빨간색
+      }
+
+      // 주사위 숫자 보이기
+      dice1.style.color = "#333";
+      dice2.style.color = "#333";
+
+      correctAnswers++;
+      document.getElementById("score").textContent = score;
+      remainingGames--;
+      document.getElementById("remainingGames").textContent = remainingGames;
+
+      if (remainingGames === 0) {
+        records.push({ name: userName, score: score });
+        records.sort((a, b) => b.score - a.score);
+        if (records.length > 5) {
+          records = records.slice(0, 5);
+        }
+        updateRecordList();
+        setTimeout(() => {
+          alert(`게임 종료! 맞춘 횟수: ${score}번`);
+          resetGame();
+        }, 500);
+      }
+
+      // 정답 입력 후 1초 뒤에 주사위 숨기기
+      setTimeout(() => {
+        dice1.style.color = "transparent";
+        dice2.style.color = "transparent";
+      }, 1500);
+
+      // 정답 입력 후 주사위 회전
+      shakeDice();
+
+      document.getElementById("userInput").value = ""; // 입력 필드 초기화
+      document.getElementById("userInput").disabled = true;  // 입력 필드 비활성화
+    }
+
+    function updateRecordList() {
+      const recordList = document.getElementById("recordList");
+      recordList.innerHTML = '';
+      records.forEach(record => {
+        const listItem = document.createElement("li");
+        listItem.textContent = `${record.name}: ${record.score}`;
+        recordList.appendChild(listItem);
+      });
+    }
+
+    function resetGame() {
+      score = 0;
+      remainingGames = 5;
+      correctAnswers = 0;
+      document.getElementById("score").textContent = score;
+      document.getElementById("remainingGames").textContent = remainingGames;
+      document.getElementById("result").textContent = "결과가 여기에 표시됩니다.";
+      document.getElementById("userSection").style.display = "flex";
+      document.getElementById("gameSection").style.display = "none";
+    }
+  </script>
+</body>
+</html>
